@@ -15,7 +15,7 @@ import 'features/profile/providers/profile_provider.dart';
 import 'features/shared/providers/theme_provider.dart';
 
 // Screens
-import 'features/products/screens/home_screen.dart';
+import 'features/home/screens/home_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/signup_screen.dart';
 import 'features/auth/screens/forgot_password_screen.dart';

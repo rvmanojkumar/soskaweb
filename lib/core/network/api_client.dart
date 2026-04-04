@@ -7,9 +7,23 @@ class ApiClient {
   factory ApiClient() => _instance;
   ApiClient._internal();
 
+  // Set this to true to use mock data, false to use real API
+  static bool useMockData = true; // ← Set to false when ready to use real API
   late Dio _dio;
 
   void init() {
+    if (!useMockData) {
+      _dio = Dio(BaseOptions(
+        baseUrl: ApiEndpoints.baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ));
+      _setupInterceptors();
+    }
     _dio = Dio(BaseOptions(
       baseUrl: ApiEndpoints.baseUrl,
       connectTimeout: const Duration(seconds: 30),

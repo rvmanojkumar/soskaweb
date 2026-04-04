@@ -15,12 +15,12 @@ import '../../../core/constants/app_colors.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productId;
-  
+
   const ProductDetailScreen({
     Key? key,
     required this.productId,
   }) : super(key: key);
-  
+
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
 }
@@ -35,45 +35,47 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final TextEditingController _reviewController = TextEditingController();
   double _rating = 0;
   final TextEditingController _questionController = TextEditingController();
-  
+
   @override
   void initState() {
     super.initState();
     _loadData();
   }
-  
+
   Future<void> _loadData() async {
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
-    
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+    final wishlistProvider =
+        Provider.of<WishlistProvider>(context, listen: false);
+
     await productProvider.loadProductDetails(widget.productId);
     await productProvider.loadProductReviews(widget.productId);
     await productProvider.loadProductQuestions(widget.productId);
-    
+
     // Check if product is in wishlist
     _isInWishlist = wishlistProvider.isInWishlist(widget.productId);
     setState(() {});
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
     final product = productProvider.currentProduct;
-    
+
     if (productProvider.isLoadingProduct) {
       return Scaffold(
         appBar: AppBar(title: Text('Product Details')),
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    
+
     if (product == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Product Details')),
         body: Center(child: Text('Product not found')),
       );
     }
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(product.name),
@@ -97,7 +99,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             // Image Carousel
             _buildImageCarousel(product),
-            
+
             Padding(
               padding: EdgeInsets.all(16),
               child: Column(
@@ -105,57 +107,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 children: [
                   // Brand & Title
                   _buildBrandAndTitle(product),
-                  
+
                   SizedBox(height: 12),
-                  
+
                   // Rating
                   _buildRating(product),
-                  
+
                   SizedBox(height: 16),
-                  
+
                   // Price
                   _buildPrice(product),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Color Selection
-                  if (product.colors.isNotEmpty)
+                  if (product.colors != null && product.colors!.isNotEmpty)
                     _buildColorSelection(product),
-                  
+
                   // Size Selection
-                  if (product.sizes.isNotEmpty)
+                  if (product.sizes != null && product.sizes!.isNotEmpty)
                     _buildSizeSelection(product),
-                  
+
                   SizedBox(height: 16),
-                  
+
                   // Quantity
                   _buildQuantitySelector(product),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Action Buttons
                   _buildActionButtons(product),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Description
                   _buildDescription(product),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Reviews Section
                   _buildReviewsSection(productProvider),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Q&A Section
                   _buildQuestionsSection(productProvider),
-                  
+
                   SizedBox(height: 24),
-                  
+
                   // Social Share
                   _buildSocialShare(product),
-                  
+
                   SizedBox(height: 32),
                 ],
               ),
@@ -165,7 +167,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Widget _buildImageCarousel(Product product) {
     return Container(
       height: 400,
@@ -240,7 +242,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Widget _buildBrandAndTitle(Product product) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +262,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildRating(Product product) {
     return Row(
       children: [
@@ -288,7 +290,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildPrice(Product product) {
     return Row(
       children: [
@@ -330,22 +332,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildColorSelection(Product product) {
+    final colors = product.colors;
+    if (colors == null || colors.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Color',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: product.colors.map((color) {
+          children: colors.map((color) {
             final isSelected = _selectedColor == color;
             return GestureDetector(
               onTap: () {
@@ -354,7 +359,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: isSelected ? AppColors.primary : Colors.grey,
@@ -367,26 +373,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             );
           }).toList(),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
       ],
     );
   }
-  
+
   Widget _buildSizeSelection(Product product) {
+    final sizes = product.sizes;
+    if (sizes == null || sizes.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Size',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: product.sizes.map((size) {
+          children: sizes.map((size) {
             final isSelected = _selectedSize == size;
             return GestureDetector(
               onTap: () {
@@ -396,7 +405,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               },
               child: Container(
                 width: 50,
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: isSelected ? AppColors.primary : Colors.grey,
@@ -408,7 +417,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Text(
                     size,
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -416,11 +426,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             );
           }).toList(),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
       ],
     );
   }
-  
+
   Widget _buildQuantitySelector(Product product) {
     return Row(
       children: [
@@ -482,7 +492,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildActionButtons(Product product) {
     return Row(
       children: [
@@ -529,7 +539,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildDescription(Product product) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,7 +563,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildReviewsSection(ProductProvider productProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +601,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: productProvider.reviews.length > 3 ? 3 : productProvider.reviews.length,
+            itemCount: productProvider.reviews.length > 3
+                ? 3
+                : productProvider.reviews.length,
             itemBuilder: (context, index) {
               final review = productProvider.reviews[index];
               return _buildReviewCard(review);
@@ -609,7 +621,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildReviewCard(Review review) {
     return Card(
       margin: EdgeInsets.only(bottom: 12),
@@ -693,7 +705,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Widget _buildQuestionsSection(ProductProvider productProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -731,7 +743,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: productProvider.questions.length > 3 ? 3 : productProvider.questions.length,
+            itemCount: productProvider.questions.length > 3
+                ? 3
+                : productProvider.questions.length,
             itemBuilder: (context, index) {
               final question = productProvider.questions[index];
               return _buildQuestionCard(question);
@@ -740,7 +754,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildQuestionCard(Question question) {
     return Card(
       margin: EdgeInsets.only(bottom: 12),
@@ -766,7 +780,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     children: [
                       Text(
                         question.userName,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       Text(
                         _formatDate(question.createdAt),
@@ -828,7 +843,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Widget _buildSocialShare(Product product) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,7 +886,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ],
     );
   }
-  
+
   Widget _buildSocialButton({
     required IconData icon,
     required Color color,
@@ -894,32 +909,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   void _addToCart(Product product) async {
     if (product.colors.isNotEmpty && _selectedColor == null) {
       _showError('Please select a color');
       return;
     }
-    
+
     if (product.sizes.isNotEmpty && _selectedSize == null) {
       _showError('Please select a size');
       return;
     }
-    
+
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (!authProvider.isAuthenticated) {
       _showError('Please login to add items to cart');
       Navigator.pushNamed(context, '/login');
       return;
     }
-    
+
     try {
       // Use variant ID if available, otherwise use product ID
       final variantId = _selectedVariantId ?? product.id;
       await cartProvider.addToCart(variantId, _quantity);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Added to cart'),
@@ -935,22 +950,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _showError('Failed to add to cart: $e');
     }
   }
-  
+
   void _buyNow(Product product) {
     _addToCart(product);
     Navigator.pushNamed(context, '/cart');
   }
-  
+
   void _toggleWishlist(Product product) async {
-    final wishlistProvider = Provider.of<WishlistProvider>(context, listen: false);
+    final wishlistProvider =
+        Provider.of<WishlistProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (!authProvider.isAuthenticated) {
       _showError('Please login to add to wishlist');
       Navigator.pushNamed(context, '/login');
       return;
     }
-    
+
     try {
       if (_isInWishlist) {
         await wishlistProvider.removeFromWishlist(product.id);
@@ -965,16 +981,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _showError('Failed to update wishlist');
     }
   }
-  
+
   void _showAddReviewDialog() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (!authProvider.isAuthenticated) {
       _showError('Please login to write a review');
       Navigator.pushNamed(context, '/login');
       return;
     }
-    
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -1027,20 +1043,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Future<void> _submitReview() async {
     if (_rating == 0) {
       _showError('Please select a rating');
       return;
     }
-    
+
     if (_reviewController.text.isEmpty) {
       _showError('Please write your review');
       return;
     }
-    
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    
+
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
     try {
       await productProvider.submitReview(
         widget.productId,
@@ -1049,7 +1066,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           'review': _reviewController.text,
         },
       );
-      
+
       Navigator.pop(context);
       _reviewController.clear();
       _rating = 0;
@@ -1058,16 +1075,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _showError('Failed to submit review');
     }
   }
-  
+
   void _showAskQuestionDialog() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (!authProvider.isAuthenticated) {
       _showError('Please login to ask a question');
       Navigator.pushNamed(context, '/login');
       return;
     }
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1093,21 +1110,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-  
+
   Future<void> _submitQuestion() async {
     if (_questionController.text.isEmpty) {
       _showError('Please enter your question');
       return;
     }
-    
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
-    
+
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+
     try {
       await productProvider.askQuestion(
         widget.productId,
         _questionController.text,
       );
-      
+
       Navigator.pop(context);
       _questionController.clear();
       _showSuccess('Question submitted successfully');
@@ -1115,19 +1133,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _showError('Failed to submit question');
     }
   }
-  
+
   void _shareProduct(Product product) async {
-    final shareText = 'Check out ${product.name} at Soskali Lifestyles!\n\nPrice: \$${product.currentPrice}\n\nRating: ${product.rating}⭐ (${product.reviewCount} reviews)';
+    final shareText =
+        'Check out ${product.name} at Soskali Lifestyles!\n\nPrice: \$${product.currentPrice}\n\nRating: ${product.rating}⭐ (${product.reviewCount} reviews)';
     await Share.share(shareText);
   }
-  
+
   void _shareOnFacebook(Product product) async {
-    final url = 'https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent('https://soskalifestyles.com/product/${product.id}')}';
+    final url =
+        'https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent('https://soskalifestyles.com/product/${product.id}')}';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
   }
-  
+
   void _shareOnWhatsApp(Product product) async {
     final text = 'Check out ${product.name} at Soskali Lifestyles!';
     final url = 'https://wa.me/?text=${Uri.encodeComponent(text)}';
@@ -1135,23 +1155,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       await launchUrl(Uri.parse(url));
     }
   }
-  
+
   void _shareOnInstagram(Product product) async {
     _showInfo('Instagram sharing coming soon!');
   }
-  
+
   void _shareOnTwitter(Product product) async {
     final text = 'Check out ${product.name} at Soskali Lifestyles!';
-    final url = 'https://twitter.com/intent/tweet?text=${Uri.encodeComponent(text)}';
+    final url =
+        'https://twitter.com/intent/tweet?text=${Uri.encodeComponent(text)}';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
   }
-  
+
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays > 365) {
       return '${(difference.inDays / 365).floor()} years ago';
     } else if (difference.inDays > 30) {
@@ -1166,19 +1187,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return 'Just now';
     }
   }
-  
+
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
-  
+
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
-  
+
   void _showInfo(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),

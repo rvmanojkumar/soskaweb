@@ -21,10 +21,7 @@ class CartApi {
     try {
       final response = await _apiClient.post(
         ApiEndpoints.addToCart,
-        data: {
-          'product_variant_id': variantId,
-          'quantity': quantity,
-        },
+        data: {'product_variant_id': variantId, 'quantity': quantity},
       );
       final itemData = response['data'] ?? response;
       return CartItem.fromJson(itemData);
@@ -36,8 +33,10 @@ class CartApi {
 
   Future<CartItem> updateCartItem(String cartItemId, int quantity) async {
     try {
-      final endpoint =
-          ApiEndpoints.updateCartItem.replaceAll('{id}', cartItemId);
+      final endpoint = ApiEndpoints.updateCartItem.replaceAll(
+        '{id}',
+        cartItemId,
+      );
       final response = await _apiClient.put(
         endpoint,
         data: {'quantity': quantity},
@@ -52,8 +51,10 @@ class CartApi {
 
   Future<void> removeCartItem(String cartItemId) async {
     try {
-      final endpoint =
-          ApiEndpoints.removeCartItem.replaceAll('{id}', cartItemId);
+      final endpoint = ApiEndpoints.removeCartItem.replaceAll(
+        '{id}',
+        cartItemId,
+      );
       await _apiClient.delete(endpoint);
     } catch (e) {
       print('Error removing cart item: $e');

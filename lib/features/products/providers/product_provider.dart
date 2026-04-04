@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../shared/data/banner_api.dart';
 import '../data/product_api.dart';
 import '../../../core/models/product.dart';
 import '../../../core/models/category.dart';
@@ -160,6 +161,7 @@ class ProductProvider extends ChangeNotifier {
   Future<void> loadBanners() async {
     try {
       _banners = await _productApi.getBanners();
+      
       notifyListeners();
     } catch (e) {
       print('Error loading banners: $e');
